@@ -1,16 +1,16 @@
-"""Contains all models for the bootstrap server"""
+"""Contains all models for the bootstrap server's requests"""
 import json
-from dataclasses import dataclass, asdict
 
+from kin import decode_transaction
 from kin.config import MEMO_CAP
-from kin.blockchain.utils import is_valid_address
+from kin.blockchain.utils import is_valid_address, is_valid_transaction_hash
 from pydantic import (BaseModel, ValidationError, 
                       Extra, validator, 
                       ExtraError, MissingError)
 
 from . import errors
 
-from typing import Union
+from typing import Optional
 
 
 def translate_validation_error(val_error: ValidationError) -> Exception:
@@ -50,20 +50,11 @@ class BaseRequest(BaseModel):
             raise translate_validation_error(e)
 
 
-@dataclass
-class BaseResponse:
-    """Abstract base response class that all response objects inherit from"""
-
-    def to_response_dict(self):
-        """Use dataclasses.asdict to get a dictionary (which sanic will use for a json response) """
-        return asdict(self)
-
-
 class PaymentRequest(BaseRequest):
 
     destination: str
     amount: float
-    memo: Union[str, None]
+    memo: Optional[str]
 
     @validator('destination')
     def validate_destination(cls, value):
@@ -82,6 +73,63 @@ class PaymentRequest(BaseRequest):
         if value is None or len(value) <= MEMO_CAP:
             return value
         raise errors.InvalidParamError(f'Memo: {value} is longer than {MEMO_CAP}')
+
+
+class CreationRequest(BaseRequest):
+    destination: str
+    starting_balance: float
+    memo: Optional[str]
+
+    @validator('destination')
+    def validate_destination(cls, value):
+        if is_valid_address(value):
+            return value
+        raise errors.InvalidParamError(f'Destination "{value}" is not a valid public address')
+
+    @validator('starting_balance')
+    def validate_amount(cls, value):
+        if value >= 0:
+            return value
+        raise errors.InvalidParamError('Starting balance for account creation must not be negative')
+
+    @validator('memo')
+    def validate_memo(cls, value):
+        if value is None or len(value) <= MEMO_CAP:
+            return value
+        raise errors.InvalidParamError(f'Memo: {value} is longer than {MEMO_CAP}')
+
+
+class WhitelistRequest(BaseRequest):
+    tx_envelope: str
+
+    @validator('tx_envelope')
+    def validate_tx_envelope(cls, value):
+        try:
+            # Try to decode the tx, network id doesn't matter
+            decode_transaction(value, '', simple=False)
+        except:
+            raise errors.InvalidParamError('The service was not able to decode the transaction envelope')
+        return value
+
+
+class BalanceRequest(BaseRequest):
+    address: str
+
+    @validator('address')
+    def validate_address(cls, value):
+        if is_valid_address(value):
+            return value
+        raise errors.InvalidParamError(f'Address: "{value}" is not a valid public address')
+
+
+class TransactionInfoRequest(BaseRequest):
+    tx_hash: str
+
+    @validator('tx_hash')
+    def validate_tx_hash(cls, value):
+        if is_valid_transaction_hash(value):
+            return value
+        raise errors.InvalidParamError(f'Transaction hash: "{value}" is not a valid transaction hash')
 
 
 

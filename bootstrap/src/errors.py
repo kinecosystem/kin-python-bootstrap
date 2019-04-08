@@ -37,7 +37,7 @@ class MissingParamError(BootstrapError):
     def __init__(self, missing_param):
         self.code = 4006
         self.http_code = 400
-        message = f'The parameter "{missing_param}"" was missing from the requests body'
+        message = f'The parameter "{missing_param}" was missing from the requests body'
         super(MissingParamError, self).__init__(message)
 
 
