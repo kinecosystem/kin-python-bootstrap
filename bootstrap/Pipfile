@@ -4,8 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+sanic = "==19.3.*"
+pydantic = "==0.23"
+kin-sdk = "==2.4.0"
 
 [dev-packages]
+ipython = "*"
 
 [requires]
 python_version = "3.7"
