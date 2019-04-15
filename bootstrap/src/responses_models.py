@@ -7,7 +7,7 @@ class BaseResponse:
     """Abstract base response class that all response objects inherit from"""
 
     def to_response_dict(self):
-        """Use dataclasses.asdict to get a dictionary (which sanic will use for a json response) """
+        """Use dataclasses.asdict to get a dictionary (which sanic will use for a json response)"""
         return asdict(self)
 
 
@@ -26,7 +26,7 @@ class PaymentInfoResponse(BaseResponse):
     source: str
     destination: str
     amount: float
-    timestamp: int
+    timestamp: float
 
 
 @dataclass

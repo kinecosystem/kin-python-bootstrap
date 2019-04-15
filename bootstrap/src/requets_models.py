@@ -1,39 +1,21 @@
 """Contains all models for the bootstrap server's requests"""
 import json
 
-from kin import decode_transaction
 from kin.config import MEMO_CAP
 from kin.blockchain.utils import is_valid_address, is_valid_transaction_hash
-from pydantic import (BaseModel, ValidationError, 
-                      Extra, validator, 
-                      ExtraError, MissingError)
+from pydantic import BaseModel, Extra, validator
 
-from . import errors
+import errors
 
 from typing import Optional
 
 
-def translate_validation_error(val_error: ValidationError) -> Exception:
-    """
-    Method to translate validation errors to 1 of 3:
-      1. Any BootstrapError
-      2. ExtraParams
-      3. MissingParams
-    """
-    first_error = val_error.raw_errors[0].exc  # We want to return the first error found
-    faulty_arg = val_error.raw_errors[0].loc[0]  # The argument that caused the error
-    if isinstance(first_error, errors.BootstrapError):
-        return first_error
-    if isinstance(first_error, ExtraError):
-        return errors.ExtraParamError(faulty_arg)
-    if isinstance(first_error, MissingError):
-        return errors.MissingParamError(faulty_arg)
-    
-    return val_error  # If we can't translate the error, raise it like that.
-
-
 class BaseRequest(BaseModel):
-    """Abstract base request class that all request objects inherit from"""
+    """
+    Abstract base request class that all request objects inherit from
+
+    pydantic already validates the types (int/float/str), and we add custom validators to all parameters as well
+    """
 
     class Config:
         extra = Extra.forbid  # Dont allow extra args
@@ -44,10 +26,7 @@ class BaseRequest(BaseModel):
             body_dict = json.loads(json_string)
         except json.JSONDecodeError:
             raise errors.InvalidBodyError()
-        try:
-            return cls(**body_dict)
-        except ValidationError as e:
-            raise translate_validation_error(e)
+        return cls(**body_dict)
 
 
 class PaymentRequest(BaseRequest):
@@ -60,7 +39,7 @@ class PaymentRequest(BaseRequest):
     def validate_destination(cls, value):
         if is_valid_address(value):
             return value
-        raise errors.InvalidParamError(f'Destination "{value}" is not a valid public address')
+        raise errors.InvalidParamError(f"Destination '{value}' is not a valid public address")
 
     @validator('amount')
     def validate_amount(cls, value):
@@ -72,7 +51,7 @@ class PaymentRequest(BaseRequest):
     def validate_memo(cls, value):
         if value is None or len(value) <= MEMO_CAP:
             return value
-        raise errors.InvalidParamError(f'Memo: {value} is longer than {MEMO_CAP}')
+        raise errors.InvalidParamError(f"Memo: '{value}' is longer than {MEMO_CAP}")
 
 
 class CreationRequest(BaseRequest):
@@ -84,7 +63,7 @@ class CreationRequest(BaseRequest):
     def validate_destination(cls, value):
         if is_valid_address(value):
             return value
-        raise errors.InvalidParamError(f'Destination "{value}" is not a valid public address')
+        raise errors.InvalidParamError(f"Destination '{value}' is not a valid public address")
 
     @validator('starting_balance')
     def validate_amount(cls, value):
@@ -96,20 +75,12 @@ class CreationRequest(BaseRequest):
     def validate_memo(cls, value):
         if value is None or len(value) <= MEMO_CAP:
             return value
-        raise errors.InvalidParamError(f'Memo: {value} is longer than {MEMO_CAP}')
+        raise errors.InvalidParamError(f"Memo: '{value}' is longer than {MEMO_CAP}")
 
 
 class WhitelistRequest(BaseRequest):
     tx_envelope: str
-
-    @validator('tx_envelope')
-    def validate_tx_envelope(cls, value):
-        try:
-            # Try to decode the tx, network id doesn't matter
-            decode_transaction(value, '', simple=False)
-        except:
-            raise errors.InvalidParamError('The service was not able to decode the transaction envelope')
-        return value
+    network_id: str
 
 
 class BalanceRequest(BaseRequest):
@@ -119,7 +90,7 @@ class BalanceRequest(BaseRequest):
     def validate_address(cls, value):
         if is_valid_address(value):
             return value
-        raise errors.InvalidParamError(f'Address: "{value}" is not a valid public address')
+        raise errors.InvalidParamError(f"Address '{value}' is not a valid public address")
 
 
 class TransactionInfoRequest(BaseRequest):
@@ -129,7 +100,7 @@ class TransactionInfoRequest(BaseRequest):
     def validate_tx_hash(cls, value):
         if is_valid_transaction_hash(value):
             return value
-        raise errors.InvalidParamError(f'Transaction hash: "{value}" is not a valid transaction hash')
+        raise errors.InvalidParamError(f"Transaction hash: '{value}' is not a valid transaction hash")
 
 
 

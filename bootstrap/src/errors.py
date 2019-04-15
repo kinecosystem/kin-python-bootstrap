@@ -1,4 +1,5 @@
 """Contains errors that are specific to the bootstrap server"""
+from pydantic import ValidationError, ExtraError, MissingError
 
 
 class InternalError(Exception):
@@ -37,7 +38,7 @@ class MissingParamError(BootstrapError):
     def __init__(self, missing_param):
         self.code = 4006
         self.http_code = 400
-        message = f'The parameter "{missing_param}" was missing from the requests body'
+        message = f"The parameter '{missing_param}' was missing from the requests body"
         super(MissingParamError, self).__init__(message)
 
 
@@ -45,7 +46,7 @@ class ExtraParamError(BootstrapError):
     def __init__(self, extra_param):
         self.code = 4007
         self.http_code = 400
-        message = f'The parameter "{extra_param}" was missing from the requests body'
+        message = f"The parameter '{extra_param}' was not expected for this requests body"
         super(ExtraParamError, self).__init__(message)
 
 
@@ -53,7 +54,7 @@ class DestinationDoesNotExistError(BootstrapError):
     def __init__(self, destination):
         self.code = 4002
         self.http_code = 400
-        message = f'Destination {destination} does not exist'
+        message = f"Destination '{destination}' does not exist"
         super(DestinationDoesNotExistError, self).__init__(message)
 
 
@@ -69,7 +70,7 @@ class AccountNotFoundError(BootstrapError):
     def __init__(self, account):
         self.code = 4041
         self.http_code = 404
-        message = f'Account {account} was not found'
+        message = f"Account '{account}' was not found"
         super(AccountNotFoundError, self).__init__(message)
 
 
@@ -77,7 +78,7 @@ class TransactionNotFoundError(BootstrapError):
     def __init__(self, tx_id):
         self.code = 4042
         self.http_code = 404
-        message = f'Transaction {tx_id} was not found'
+        message = f"Transaction {tx_id} was not found"
         super(TransactionNotFoundError, self).__init__(message)
 
 
@@ -103,3 +104,22 @@ class InvalidBodyError(BootstrapError):
         self.http_code = 400
         message = f'The received body was not a valid json'
         super(InvalidBodyError, self).__init__(message)
+
+
+def translate_validation_error(val_error: ValidationError) -> BootstrapError:
+    """
+    Method to translate validation errors to 1 of 3:
+      1. Any BootstrapError
+      2. ExtraParams
+      3. MissingParams
+    """
+    first_error = val_error.raw_errors[0].exc  # We want to return the first error found
+    faulty_arg = val_error.raw_errors[0].loc[0]  # The argument that caused the error
+    if isinstance(first_error, BootstrapError):
+        return first_error
+    if isinstance(first_error, ExtraError):
+        return ExtraParamError(faulty_arg)
+    if isinstance(first_error, MissingError):
+        return MissingParamError(faulty_arg)
+
+    raise val_error  # If we can't translate the error, raise it like that.
