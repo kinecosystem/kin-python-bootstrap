@@ -46,7 +46,7 @@ async def get_tx_info(request, tx_hash: str):
         raise errors.InvalidTransactionError()
 
     # Convert from '2018-11-12T06:45:40Z' to unix timestamp
-    timestamp = datetime.strptime(tx.timestamp, '%Y-%m-%dT%H:%M:%SZ').timestamp()
+    timestamp = datetime.strptime(tx.timestamp, '%Y-%m-%dT%H:%M:%S%z').timestamp()
     info_response = responses_models.PaymentInfoResponse(tx.source,
                                                          tx.operation.destination,
                                                          tx.operation.amount,

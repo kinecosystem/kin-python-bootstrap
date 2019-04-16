@@ -94,7 +94,7 @@ async def test_tx_info(test_cli):
     assert tx_info_resp['destination'] == 'GARY2346NSTEI2WGYTC3ULQDJGJJ4EPP3IPTYLM7QWNWEPCEGA2EQJK5'
     assert tx_info_resp['amount'] == 10
     assert tx_info_resp['memo'] == '1-xnXb-33a7c05eda014bfd'
-    assert tx_info_resp['timestamp'] == 1555319165
+    assert tx_info_resp['timestamp'] == 1555329965
 
 
 async def test_tx_info_invalid(test_cli):
