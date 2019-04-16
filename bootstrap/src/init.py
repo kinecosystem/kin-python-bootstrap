@@ -9,7 +9,7 @@ from sanic import Sanic
 from . import log
 from .config import config
 
-VERSION = '0.0.1'
+VERSION = '1.0.0'
 
 # Setup logging
 log.init_logging()
