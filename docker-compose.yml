@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  bootstrap:
+    image: kinecosystem/python-bootstrap:1.0.0
+    environment:
+      SEED:
+      HORIZON_ENDPOINT:
+      NETWORK_PASSPHRASE:
+      APP_ID:
+      CHANNEL_COUNT: 100
+      CHANNEL_SALT:
+      CHANNEL_STARTING_BALANCE:
+      PORT: 8000
+      LOG_LEVEL: 'INFO'
