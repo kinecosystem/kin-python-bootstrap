@@ -15,3 +15,6 @@ install:
 
 script:
   - pipenv run python -m pytest -v --disable-warnings
+
+notifications:
+  email: false
