@@ -1,6 +1,6 @@
 """Main entry point"""
 
-from config import config
+from src.config import config
 from src.routes import app
 
-app.run(access_log=False, port=config.PORT)
+app.run(access_log=False, host='0.0.0.0', port=config.PORT)
