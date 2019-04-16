@@ -6,8 +6,8 @@ import kin
 from kin.utils import create_channels
 from sanic import Sanic
 
-import log
-from config import config
+from . import log
+from .config import config
 
 VERSION = '0.0.1'
 
