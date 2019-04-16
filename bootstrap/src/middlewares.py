@@ -7,9 +7,9 @@ from contextvars import ContextVar
 from sanic.exceptions import SanicException
 from pydantic import ValidationError
 
-import errors
-from helpers import json_response
-from log import req_id, req_id_generator
+from . import errors
+from .helpers import json_response
+from .log import req_id, req_id_generator
 
 req_start_time: ContextVar[int] = ContextVar('req_start_time', default=None)
 
@@ -47,11 +47,6 @@ def bootstrap_error_handle(request, exception: errors.BootstrapError):
     # If it is one of our custom errors, log it
     logger.error(exception.error)
     return json_response(exception.to_dict(), exception.http_code)
-
-
-def validation_error_handler(request, exception: ValidationError):
-    # Translate and raise return bootstrap error
-    return bootstrap_error_handle(request, errors.translate_validation_error(exception))
 
 
 def http_error_handler(request, exception: SanicException):

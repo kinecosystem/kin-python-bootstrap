@@ -58,6 +58,8 @@ paths:
           $ref: '#/definitions/TransactionResponse'
         400:
           $ref: '#/definitions/LowBalanceError'
+        400/:
+          $ref: '#/definitions/DestinationExistsError'
           
   /balance/{address}:
     get:
@@ -199,15 +201,17 @@ definitions:
       amount:
         type: number
         example: 15
+      memo:
+        type: string
+        example: "Hello"
       timestamp:
         type: integer
         example: 1547545819
         
   WhitelistRequest:
     type: object
-    required: [tx_envelope]
     properties:
-      tx_envelope:
+      envelope:
         type: string
         example: AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
       network_id:
@@ -324,6 +328,17 @@ definitions:
       message:
         type: string
         example: "Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' does not exist"
+
+  DestinationExistsError:
+    description: "Destination already exists"
+    type: object
+    properties:
+      code:
+        type: number
+        example: 4009
+      message:
+        type: string
+        example: "Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' already exists"
         
   LowBalanceError:
     description: 'Low balance'

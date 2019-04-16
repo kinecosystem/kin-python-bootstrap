@@ -7,12 +7,12 @@ from kin import KinErrors
 from sanic.exceptions import SanicException
 from pydantic import ValidationError
 
-import errors
-import middlewares
-import requets_models
-import responses_models
-from helpers import json_response, get_model
-from __init__ import app, VERSION
+from . import errors
+from . import middlewares
+from . import requets_models
+from . import responses_models
+from .helpers import json_response, get_model
+from .init import app, VERSION
 
 logger = logging.getLogger('bootstrap')
 
@@ -50,6 +50,7 @@ async def get_tx_info(request, tx_hash: str):
     info_response = responses_models.PaymentInfoResponse(tx.source,
                                                          tx.operation.destination,
                                                          tx.operation.amount,
+                                                         tx.memo,
                                                          timestamp)
 
     return json_response(info_response.to_response_dict(), 200)
@@ -77,7 +78,7 @@ async def pay(payment_request: requets_models.PaymentRequest):
                                                app.minimum_fee,
                                                payment_request.memo)
     except KinErrors.AccountNotFoundError:
-        raise errors.AccountNotFoundError(payment_request.destination)
+        raise errors.DestinationDoesNotExistError(payment_request.destination)
     except KinErrors.LowBalanceError:
         raise errors.LowBalanceError()
 
@@ -94,6 +95,8 @@ async def create(creation_request: requets_models.CreationRequest):
                                                      creation_request.memo)
     except KinErrors.LowBalanceError:
         raise errors.LowBalanceError()
+    except KinErrors.AccountExistsError:
+        raise errors.DestinationExistsError(creation_request.destination)
 
     return json_response(responses_models.TransactionResponse(tx_id).to_response_dict(), 200)
 
@@ -103,6 +106,9 @@ async def create(creation_request: requets_models.CreationRequest):
 async def create(whitelist_request: requets_models.WhitelistRequest):
     try:
         whitelisted_tx = app.kin_account.whitelist_transaction(whitelist_request.dict())
+    except kin.KinErrors.WrongNetworkError:
+        raise errors.InvalidParamError(f'The network id sent in the request doesn\'t '
+                                       f'match the network the server is configured with')
     except:
         raise errors.CantDecodeTransactionError()
 
@@ -112,8 +118,6 @@ async def create(whitelist_request: requets_models.WhitelistRequest):
 app.register_middleware(middlewares.before_request, 'request')
 app.register_middleware(middlewares.before_response, 'response')
 app.register_listener(middlewares.close_kin_client, 'after_server_stop')
-app.error_handler.add(ValidationError, middlewares.validation_error_handler)
 app.error_handler.add(errors.BootstrapError, middlewares.bootstrap_error_handle)
 app.error_handler.add(SanicException, middlewares.http_error_handler)
 app.error_handler.add(Exception, middlewares.internal_error_handler)
-app.run(access_log=False)

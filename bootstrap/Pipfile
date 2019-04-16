@@ -10,6 +10,9 @@ kin-sdk = "==2.4.0"
 
 [dev-packages]
 ipython = "*"
+pytest = "*"
+pytest-sanic = "==1.0.0"
+asynctest = "*"
 
 [requires]
 python_version = "3.7"

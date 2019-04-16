@@ -4,8 +4,9 @@ import json
 from kin.config import MEMO_CAP
 from kin.blockchain.utils import is_valid_address, is_valid_transaction_hash
 from pydantic import BaseModel, Extra, validator
+from pydantic import ValidationError
 
-import errors
+from . import errors
 
 from typing import Optional
 
@@ -20,11 +21,20 @@ class BaseRequest(BaseModel):
     class Config:
         extra = Extra.forbid  # Dont allow extra args
 
+    def __init__(self, **data):
+        try:
+            super(BaseRequest, self).__init__(**data)
+        except ValidationError as e:
+            raise errors.translate_validation_error(e)
+
     @classmethod
     def from_json(cls, json_string):
         try:
             body_dict = json.loads(json_string)
         except json.JSONDecodeError:
+            raise errors.InvalidBodyError()
+        if not isinstance(body_dict, dict):
+            # json.loads might return string in some cases like json.loads('"{}"')
             raise errors.InvalidBodyError()
         return cls(**body_dict)
 
@@ -79,7 +89,7 @@ class CreationRequest(BaseRequest):
 
 
 class WhitelistRequest(BaseRequest):
-    tx_envelope: str
+    envelope: str
     network_id: str
 
 
@@ -101,7 +111,4 @@ class TransactionInfoRequest(BaseRequest):
         if is_valid_transaction_hash(value):
             return value
         raise errors.InvalidParamError(f"Transaction hash: '{value}' is not a valid transaction hash")
-
-
-
 

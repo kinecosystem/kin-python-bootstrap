@@ -1,7 +1,7 @@
 from functools import wraps
 
 from sanic import response
-from requets_models import BaseRequest
+from .requets_models import BaseRequest
 
 
 def json_response(resp: dict, http_code: int) -> response.HTTPResponse:
@@ -17,7 +17,7 @@ def get_model(model: BaseRequest):
         @wraps(func)
         def wrapper(*args, **kwargs):
             request = args[0]
-            return func(model.from_json(request.body))
+            return func(model.from_json(request.body.decode()))
 
         return wrapper
     return decorator

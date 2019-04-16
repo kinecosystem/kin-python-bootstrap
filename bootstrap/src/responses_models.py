@@ -1,6 +1,7 @@
 """Contains all models for the bootstrap server's responses"""
 from dataclasses import dataclass, asdict
 
+from typing import Optional
 
 @dataclass
 class BaseResponse:
@@ -26,6 +27,7 @@ class PaymentInfoResponse(BaseResponse):
     source: str
     destination: str
     amount: float
+    memo: Optional[str]
     timestamp: float
 
 

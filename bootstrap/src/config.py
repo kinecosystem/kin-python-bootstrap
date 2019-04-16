@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     CHANNEL_SALT: str = 'bootstrap'
     CHANNEL_STARTING_BALANCE: int = 1
     PORT: int = 8000
-    LOG_LEVEL: str = 'DEBUG'
+    LOG_LEVEL: str = 'INFO'
 
     class Config:
         env_prefix = ''

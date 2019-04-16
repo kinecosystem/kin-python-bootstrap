@@ -1,5 +1,5 @@
 """Contains errors that are specific to the bootstrap server"""
-from pydantic import ValidationError, ExtraError, MissingError
+from pydantic import ValidationError, ExtraError, MissingError, PydanticTypeError
 
 
 class InternalError(Exception):
@@ -98,6 +98,14 @@ class CantDecodeTransactionError(BootstrapError):
         super(CantDecodeTransactionError, self).__init__(message)
 
 
+class DestinationExistsError(BootstrapError):
+    def __init__(self, destination):
+        self.code = 4009
+        self.http_code = 400
+        message = f"Destination '{destination}' already exists"
+        super(DestinationExistsError, self).__init__(message)
+
+
 class InvalidBodyError(BootstrapError):
     def __init__(self):
         self.code = 4008
@@ -108,10 +116,11 @@ class InvalidBodyError(BootstrapError):
 
 def translate_validation_error(val_error: ValidationError) -> BootstrapError:
     """
-    Method to translate validation errors to 1 of 3:
+    Method to translate validation errors to 1 of 4:
       1. Any BootstrapError
       2. ExtraParams
       3. MissingParams
+      4. InvalidParam
     """
     first_error = val_error.raw_errors[0].exc  # We want to return the first error found
     faulty_arg = val_error.raw_errors[0].loc[0]  # The argument that caused the error
@@ -121,5 +130,7 @@ def translate_validation_error(val_error: ValidationError) -> BootstrapError:
         return ExtraParamError(faulty_arg)
     if isinstance(first_error, MissingError):
         return MissingParamError(faulty_arg)
+    if isinstance(first_error, PydanticTypeError):
+        return InvalidParamError(f'Parameter {faulty_arg}, is invalid: {first_error}')
 
     raise val_error  # If we can't translate the error, raise it like that.
