@@ -21,6 +21,3 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = ''
-
-
-config = Settings()

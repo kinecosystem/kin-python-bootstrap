@@ -4,8 +4,17 @@ import kin
 import pytest
 import asynctest
 
-from src.routes import app, VERSION
+import sys
+sys.path.append("..")
+
+from src.init import init_app, VERSION
 from src import errors
+from src.config import Settings
+
+app = init_app(Settings())
+# Remove the setup_kin_with_network listener, we dont want to make calls to the blockchain in tests
+del app.listeners['before_server_start'][1]
+app.minimum_fee = 100
 
 
 @pytest.fixture

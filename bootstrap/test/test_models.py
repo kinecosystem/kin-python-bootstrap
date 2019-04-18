@@ -1,5 +1,8 @@
 import pytest
 
+import sys
+sys.path.append("..")
+
 from src import errors, requets_models
 
 
