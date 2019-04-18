@@ -10,7 +10,7 @@ from sanic import Sanic
 from sanic.exceptions import SanicException
 
 from . import errors
-from .helpers import json_response
+from .helpers import json_response, prettify_exc
 from .log import req_id, req_id_generator
 
 req_start_time: ContextVar[int] = ContextVar('req_start_time', default=None)
@@ -93,5 +93,6 @@ def init_middlewares(app: Sanic, config):
     @app.exception(Exception)
     def internal_error_handler(request, exception: Exception):
         # Log the exception and return an internal server error
-        logger.error(f'Unexpected exception: {str(exception)}')
+        logger.error(f'Unexpected exception:\n'
+                     f'{prettify_exc(exception)}')
         return json_response(errors.InternalError().to_dict(), errors.InternalError.code)

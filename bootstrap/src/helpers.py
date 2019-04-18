@@ -1,3 +1,4 @@
+import traceback
 from functools import wraps
 
 from sanic import response
@@ -21,3 +22,7 @@ def get_model(model: BaseRequest):
 
         return wrapper
     return decorator
+
+
+def prettify_exc(exception: Exception) -> str:
+    return ''.join(traceback.format_exception(None, exception, exception.__traceback__))
