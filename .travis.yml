@@ -3,6 +3,9 @@ dist: xenial
 python:
   - "3.7"
 
+services:
+  - docker
+
 cache:
   - pip
 
@@ -15,6 +18,7 @@ install:
 
 script:
   - pipenv run python -m pytest -v --disable-warnings
+  - cd .. && docker build .
 
 notifications:
   email: false
