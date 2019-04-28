@@ -3,6 +3,8 @@ version: '3'
 services:
   bootstrap:
     image: kinecosystem/python-bootstrap:1.0.0
+    ports:
+      - 8000:8000
     environment:
       SEED:
       HORIZON_ENDPOINT:
