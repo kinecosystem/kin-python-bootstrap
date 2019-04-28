@@ -1,5 +1,5 @@
 # kin-python-bootstrap
-A ready to use server using the kin-python-sdk
+A ready to use server using the [kin-python-sdk](https://github.com/kinecosystem/kin-sdk-python/tree/v2-master)
 
 ## Prerequisites
 * [Docker](https://github.com/docker/docker-install)
