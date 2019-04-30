@@ -1,0 +1,24 @@
+language: python
+dist: xenial
+python:
+  - "3.7"
+
+services:
+  - docker
+
+cache:
+  - pip
+
+before_install:
+  - cd bootstrap
+
+install:
+  - pip install pipenv
+  - pipenv install -d
+
+script:
+  - pipenv run python -m pytest -v --disable-warnings
+  - docker build .
+
+notifications:
+  email: false
