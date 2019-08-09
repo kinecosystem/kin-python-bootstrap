@@ -29,7 +29,9 @@ paths:
           $ref: '#/definitions/PaymentReqeust'
       responses:
         200:
-          $ref: '#/definitions/TransactionResponse'
+          description: 'Successfull request'
+          schema:
+            $ref: '#/definitions/TransactionResponse'
         # Swagger doesn't support same http code for several responses, so i add a slash to bypass it
         400:
           $ref: '#/definitions/DestinationDoesNotExistError'
@@ -55,7 +57,9 @@ paths:
           $ref: '#/definitions/CreationRequest'
       responses:
         200:
-          $ref: '#/definitions/TransactionResponse'
+          description: 'Successfull request'
+          schema:
+            $ref: '#/definitions/TransactionResponse'
         400:
           $ref: '#/definitions/LowBalanceError'
         400/:
@@ -77,7 +81,9 @@ paths:
           description: The public address of the account to query
       responses:
         200:
-          $ref: '#/definitions/BalanceResponse'
+          description: 'Successfull request'
+          schema:
+            $ref: '#/definitions/BalanceResponse'
         400:
           $ref: '#/definitions/AccountNotFoundError'
           
@@ -97,7 +103,9 @@ paths:
           description: The hash of the payment transaction
       responses:
         200:
-          $ref: '#/definitions/PaymentInfoResponse'
+          description: 'Successfull request'
+          schema:
+            $ref: '#/definitions/PaymentInfoResponse'
         400:
           $ref: '#/definitions/TransactionNotFoundError'
         404/:
@@ -124,7 +132,9 @@ paths:
           $ref: '#/definitions/WhitelistRequest'
       responses:
         200:
-          $ref: '#/definitions/WhitelistResponse'
+          description: 'Successfull request'
+          schema:
+            $ref: '#/definitions/WhitelistResponse'
         400:
           $ref: '#/definitions/CantDecodeTransactionError'
         
@@ -139,7 +149,9 @@ paths:
       - "application/json"
       responses:
         200:
-          $ref: '#/definitions/StatusResponse'
+          description: "Successfull request"
+          schema:
+            $ref: '#/definitions/StatusResponse'
 
           
 definitions:
@@ -173,7 +185,6 @@ definitions:
         example: null
         
   TransactionResponse:
-    description: 'Successfull payment'
     type: object
     properties:
       tx_id:
@@ -181,7 +192,6 @@ definitions:
         example: ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd
         
   BalanceResponse:
-    description: 'Successfull request'
     type: object
     properties:
       balance:
@@ -189,7 +199,6 @@ definitions:
         example: 154.5
         
   PaymentInfoResponse:
-    description: 'Successfull request'
     type: object
     properties:
       source:
@@ -219,7 +228,6 @@ definitions:
         example: "Kin Mainnet ; December 2018"
 
   WhitelistResponse:
-    description: 'Successfull request'
     type: object
     properties:
       tx_envelope:
@@ -227,7 +235,6 @@ definitions:
         example: AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
         
   StatusResponse:
-    description: 'Successfull request'
     type: object
     properties:
       service_version:
