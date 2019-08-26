@@ -158,7 +158,7 @@ definitions:
 
   PaymentReqeust:
     type: object
-    required: [destination, amount, memp]
+    required: [destination, amount, memo]
     properties:
       destination:
         type: string
