@@ -106,9 +106,9 @@ paths:
           description: 'Successfull request'
           schema:
             $ref: '#/definitions/PaymentInfoResponse'
-        400:
+        404:
           $ref: '#/definitions/TransactionNotFoundError'
-        404/:
+        400:
           $ref: '#/definitions/InvalidTransactionError'
         
           
@@ -158,7 +158,7 @@ definitions:
 
   PaymentReqeust:
     type: object
-    required: [destination, amount, memp]
+    required: [destination, amount, memo]
     properties:
       destination:
         type: string
