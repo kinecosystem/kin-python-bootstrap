@@ -26,7 +26,7 @@ paths:
         description: "Payment Request object"
         required: true
         schema:
-          $ref: '#/definitions/PaymentReqeust'
+          $ref: '#/definitions/PaymentRequest'
       responses:
         200:
           description: 'Successfull request'
@@ -156,7 +156,7 @@ paths:
           
 definitions:
 
-  PaymentReqeust:
+  PaymentRequest:
     type: object
     required: [destination, amount, memo]
     properties:
