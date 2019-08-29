@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: "Micro service to invoke common kin stuff using the kin-python-sdk."
-  version: "1.0.0"
+  version: "2.0.0"
   title: "Kin Python Microservice"
   license:
     name: "MIT"
@@ -26,18 +26,17 @@ paths:
         description: "Payment Request object"
         required: true
         schema:
-          $ref: '#/definitions/PaymentRequest'
+          $ref: "#/definitions/PaymentRequest"
       responses:
         200:
-          description: 'Successfull request'
+          description: "Successful request"
           schema:
-            $ref: '#/definitions/TransactionResponse'
-        # Swagger doesn't support same http code for several responses, so i add a slash to bypass it
+            $ref: "#/definitions/TransactionResponse"
         400:
-          $ref: '#/definitions/DestinationDoesNotExistError'
-        400/:
-          $ref: '#/definitions/LowBalanceError'
-          
+          $ref: "#/definitions/LowBalanceError"
+        404:
+          $ref: "#/definitions/DestinationDoesNotExistError"
+
   /create:
     post:
       tags:
@@ -54,17 +53,17 @@ paths:
         description: "Creation request object"
         required: true
         schema:
-          $ref: '#/definitions/CreationRequest'
+          $ref: "#/definitions/CreationRequest"
       responses:
         200:
-          description: 'Successfull request'
+          description: "Successful request"
           schema:
-            $ref: '#/definitions/TransactionResponse'
+            $ref: "#/definitions/TransactionResponse"
         400:
-          $ref: '#/definitions/LowBalanceError'
-        400/:
-          $ref: '#/definitions/DestinationExistsError'
-          
+          $ref: "#/definitions/LowBalanceError"
+        409:
+          $ref: "#/definitions/DestinationExistsError"
+
   /balance/{address}:
     get:
       tags:
@@ -81,12 +80,12 @@ paths:
           description: The public address of the account to query
       responses:
         200:
-          description: 'Successfull request'
+          description: "Successful request"
           schema:
-            $ref: '#/definitions/BalanceResponse'
+            $ref: "#/definitions/BalanceResponse"
         400:
-          $ref: '#/definitions/AccountNotFoundError'
-          
+          $ref: "#/definitions/AccountNotFoundError"
+
   /payment/{tx_hash}:
     get:
       tags:
@@ -103,16 +102,16 @@ paths:
           description: The hash of the payment transaction
       responses:
         200:
-          description: 'Successfull request'
+          description: "Successful request"
           schema:
-            $ref: '#/definitions/PaymentInfoResponse'
+            $ref: "#/definitions/PaymentInfoResponse"
         404:
-          $ref: '#/definitions/TransactionNotFoundError'
+          $ref: "#/definitions/TransactionNotFoundError"
         400:
-          $ref: '#/definitions/InvalidTransactionError'
-        
-          
-          
+          $ref: "#/definitions/InvalidTransactionError"
+
+
+
   /whitelist:
     post:
       tags:
@@ -129,16 +128,16 @@ paths:
         description: "Whitelist request object"
         required: true
         schema:
-          $ref: '#/definitions/WhitelistRequest'
+          $ref: "#/definitions/WhitelistRequest"
       responses:
         200:
-          description: 'Successfull request'
+          description: "Successful request"
           schema:
-            $ref: '#/definitions/WhitelistResponse'
+            $ref: "#/definitions/WhitelistResponse"
         400:
-          $ref: '#/definitions/CantDecodeTransactionError'
-        
-          
+          $ref: "#/definitions/CantDecodeTransactionError"
+
+
   /status:
     get:
       tags:
@@ -149,11 +148,11 @@ paths:
       - "application/json"
       responses:
         200:
-          description: "Successfull request"
+          description: "Successful request"
           schema:
-            $ref: '#/definitions/StatusResponse'
+            $ref: "#/definitions/StatusResponse"
 
-          
+
 definitions:
 
   PaymentRequest:
@@ -169,7 +168,7 @@ definitions:
       memo:
         type: string
         example: "Order-123"
-        
+
   CreationRequest:
     type: object
     required: [destination, starting_balance, memo]
@@ -183,21 +182,21 @@ definitions:
       memo:
         type: string
         example: null
-        
+
   TransactionResponse:
     type: object
     properties:
       tx_id:
         type: string
         example: ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd
-        
+
   BalanceResponse:
     type: object
     properties:
       balance:
         type: number
         example: 154.5
-        
+
   PaymentInfoResponse:
     type: object
     properties:
@@ -216,7 +215,7 @@ definitions:
       timestamp:
         type: integer
         example: 1547545819
-        
+
   WhitelistRequest:
     type: object
     properties:
@@ -233,7 +232,7 @@ definitions:
       tx_envelope:
         type: string
         example: AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
-        
+
   StatusResponse:
     type: object
     properties:
@@ -264,11 +263,11 @@ definitions:
           total_channels:
             type: number
             example: 20
-            
+
 # Global Errors
 
   InvalidParamError:
-    description: 'Invalid parameter'
+    description: "Invalid parameter"
     type: object
     properties:
       code:
@@ -277,9 +276,9 @@ definitions:
       message:
         type: string
         example: "Destination 'qwert' is not a valid public address"
-        
+
   InternalError:
-    description: 'Internal server error'
+    description: "Internal server error"
     type: object
     properties:
       code:
@@ -288,9 +287,9 @@ definitions:
       message:
         type: string
         example: "Internal server error"
-        
+
   MissingParamError:
-    description: 'Missing parameters'
+    description: "Missing parameters"
     type: object
     properties:
       code:
@@ -299,9 +298,9 @@ definitions:
       message:
         type: string
         example: "The parameter '{missing_param}' was missing from the requests body"
-        
+
   ExtraParamError:
-    description: 'Extra parameters'
+    description: "Extra parameters"
     type: object
     properties:
       code:
@@ -312,7 +311,7 @@ definitions:
         example: "The parameter '{extra_param}' was not expected for this requests body"
 
   InvalidBodyError:
-    description: 'Invalid body'
+    description: "Invalid body"
     type: object
     properties:
       code:
@@ -320,8 +319,8 @@ definitions:
         example: 4008
       message:
         type: string
-        example: 'The received body was not a valid json'
-  
+        example: "The received body was not a valid json"
+
 
 # Specific Errors
 
@@ -346,9 +345,9 @@ definitions:
       message:
         type: string
         example: "Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' already exists"
-        
+
   LowBalanceError:
-    description: 'Low balance'
+    description: "Low balance"
     type: object
     properties:
       code:
@@ -357,9 +356,9 @@ definitions:
       message:
         type: string
         example: "The account does not have enough kin to perform this operation"
-        
+
   AccountNotFoundError:
-    description: 'Account not found'
+    description: "Account not found"
     type: object
     properties:
       code:
@@ -368,9 +367,9 @@ definitions:
       message:
         type: string
         example: "Account 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' was not found"
-        
+
   TransactionNotFoundError:
-    description: 'Transaction not found'
+    description: "Transaction not found"
     type: object
     properties:
       code:
@@ -379,9 +378,9 @@ definitions:
       message:
         type: string
         example: "Transaction 'ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd' was not found"
-        
+
   InvalidTransactionError:
-    description: 'Invalid transaction found'
+    description: "Invalid transaction found"
     type: object
     properties:
       code:
@@ -390,9 +389,9 @@ definitions:
       message:
         type: string
         example: "The specified transaction was not a valid kin payment transaction"
-        
+
   CantDecodeTransactionError:
-    description: 'Cant decode the transaction envelope'
+    description: "Cant decode the transaction envelope"
     type: object
     properties:
       code:
@@ -401,4 +400,3 @@ definitions:
       message:
         type: string
         example: "The service is unable to decode the received transaction envelope"
-        
