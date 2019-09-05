@@ -1,402 +1,406 @@
-swagger: "2.0"
+openapi: 3.0.0
 info:
+  title: "Kin Python Microservice"
   description: "Micro service to invoke common kin stuff using the kin-python-sdk."
   version: "2.0.0"
-  title: "Kin Python Microservice"
   license:
-    name: "MIT"
-    url: "https://opensource.org/licenses/MIT"
-schemes:
-- "https"
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - description: Do not expose an instance of this server directly to the public
+    url: http://localhost:8000
+security: []
 paths:
-
   /pay:
     post:
       tags:
-      - "Endpoints:"
-      summary: "Send KIN to an address"
-      operationId: "sendKin"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Payment Request object"
-        required: true
-        schema:
-          $ref: "#/definitions/PaymentRequest"
+        - Endpoints
+      summary: Send KIN to an address
+      operationId: sendKin
       responses:
-        200:
-          description: "Successful request"
-          schema:
-            $ref: "#/definitions/TransactionResponse"
-        400:
-          $ref: "#/definitions/LowBalanceError"
-        404:
-          $ref: "#/definitions/DestinationDoesNotExistError"
-
+        "200":
+          $ref: "#/components/responses/SuccessfulTransaction"
+        "400":
+          $ref: "#/components/responses/LowBalanceError"
+        "404":
+          description: Receiver address does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationDoesNotExistError"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        description: Payment Request object
+        required: true
   /create:
     post:
       tags:
-      - "Endpoints:"
-      summary: "Create an account on the blockchain"
-      operationId: "createAccount"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Creation request object"
-        required: true
-        schema:
-          $ref: "#/definitions/CreationRequest"
+        - Endpoints
+      summary: Create an account on the blockchain
+      operationId: createAccount
       responses:
-        200:
-          description: "Successful request"
-          schema:
-            $ref: "#/definitions/TransactionResponse"
-        400:
-          $ref: "#/definitions/LowBalanceError"
-        409:
-          $ref: "#/definitions/DestinationExistsError"
-
+        "200":
+          $ref: "#/components/responses/SuccessfulTransaction"
+        "400":
+          $ref: "#/components/responses/LowBalanceError"
+        "409":
+          description: Receiver address already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationExistsError"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreationRequest"
+        description: Creation request object
+        required: true
   /balance/{address}:
     get:
       tags:
-      - "Endpoints:"
-      summary: "Get the KIN balance of an account"
-      operationId: "getBalance"
-      produces:
-      - "application/json"
+        - Endpoints
+      summary: Get the KIN balance of an account
+      operationId: getBalance
       parameters:
         - in: path
           name: address
           required: true
-          type: string
           description: The public address of the account to query
-      responses:
-        200:
-          description: "Successful request"
           schema:
-            $ref: "#/definitions/BalanceResponse"
-        400:
-          $ref: "#/definitions/AccountNotFoundError"
-
+            type: string
+      responses:
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceResponse"
+        "400":
+          description: Account address not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountNotFoundError"
   /payment/{tx_hash}:
     get:
       tags:
-      - "Endpoints:"
-      summary: "Get info about a kin payment"
-      operationId: "getPayment"
-      produces:
-      - "application/json"
+        - Endpoints
+      summary: Get info about a kin payment
+      operationId: getPayment
       parameters:
         - in: path
           name: tx_hash
           required: true
-          type: string
           description: The hash of the payment transaction
-      responses:
-        200:
-          description: "Successful request"
           schema:
-            $ref: "#/definitions/PaymentInfoResponse"
-        404:
-          $ref: "#/definitions/TransactionNotFoundError"
-        400:
-          $ref: "#/definitions/InvalidTransactionError"
-
-
-
+            type: string
+      responses:
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentInfoResponse"
+        "400":
+          description: Invalid transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidTransactionError"
+        "404":
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionNotFoundError"
   /whitelist:
     post:
       tags:
-      - "Endpoints:"
-      summary: "Whitelist a transaction"
-      operationId: "whitelist"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Whitelist request object"
-        required: true
-        schema:
-          $ref: "#/definitions/WhitelistRequest"
+        - Endpoints
+      summary: Whitelist a transaction
+      operationId: whitelist
       responses:
-        200:
-          description: "Successful request"
-          schema:
-            $ref: "#/definitions/WhitelistResponse"
-        400:
-          $ref: "#/definitions/CantDecodeTransactionError"
-
-
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhitelistResponse"
+        "400":
+          description: Can't decode the transaction envelope
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CantDecodeTransactionError"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhitelistRequest"
+        description: Whitelist request object
+        required: true
   /status:
     get:
       tags:
-      - "Endpoints:"
-      summary: "Get the current config/status of the service (Use as healthcheck)"
-      operationId: "status"
-      produces:
-      - "application/json"
+        - Endpoints
+      summary: Get the current config/status of the service (Use as health check)
+      operationId: status
       responses:
-        200:
-          description: "Successful request"
+        "200":
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+
+components:
+  schemas:
+    CreationRequest:
+      type: object
+      required:
+        - destination
+        - starting_balance
+        - memo
+      properties:
+        destination:
+          type: string
+          example: GCJEHC2UOSIDPPIHJ2SH3B2ZL5XBB7KYK2M6OHXZTUW4NI2NEVVFVDLD
+        starting_balance:
+          type: number
+          example: 5
+        memo:
+          type: string
+          example: null
+    PaymentRequest:
+      type: object
+      required:
+        - destination
+        - amount
+        - memo
+      properties:
+        destination:
+          type: string
+          example: GCJEHC2UOSIDPPIHJ2SH3B2ZL5XBB7KYK2M6OHXZTUW4NI2NEVVFVDLD
+        amount:
+          type: number
+          example: 130
+        memo:
+          type: string
+          example: Order-123
+    WhitelistRequest:
+      type: object
+      properties:
+        envelope:
+          type: string
+          example: >-
+            AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
+        network_id:
+          type: string
+          example: Kin Mainnet ; December 2018
+
+    BalanceResponse:
+      type: object
+      properties:
+        balance:
+          type: number
+          example: 154.5
+    PaymentInfoResponse:
+      type: object
+      properties:
+        source:
+          type: string
+          example: GDG57ST5LAJNFKSZHSSX7ME3ET6JTZQHDQF5LX7OM2GJNRSE2VJ2OSKB
+        destination:
+          type: string
+          example: GA3YVWB2N3RJCDNAGRD6WC6QIDYC5VP6KRBSG3EDL4UFQKMJBVMAET6Y
+        amount:
+          type: number
+          example: 15
+        memo:
+          type: string
+          example: Hello
+        timestamp:
+          type: integer
+          example: 1547545819
+    StatusResponse:
+      type: object
+      properties:
+        service_version:
+          type: string
+          example: 1.4.2
+        horizon:
+          type: string
+          example: http://horizon.kinfederation.com
+        app_id:
+          type: string
+          example: rc43
+        public_address:
+          type: string
+          example: GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX
+        balance:
+          type: number
+          example: 179875
+        channels:
+          type: object
+          properties:
+            free_channels:
+              type: number
+              example: 17
+            non_free_channels:
+              type: number
+              example: 3
+            total_channels:
+              type: number
+              example: 20
+    TransactionResponse:
+      type: object
+      properties:
+        tx_id:
+          type: string
+          example: ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd
+    WhitelistResponse:
+      type: object
+      properties:
+        tx_envelope:
+          type: string
+          example: >-
+            AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
+
+    AccountNotFoundError:
+      description: Account not found
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4041
+        message:
+          type: string
+          example: Account 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' was not found
+    CantDecodeTransactionError:
+      description: Cant decode the transaction envelope
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4005
+        message:
+          type: string
+          example: The service is unable to decode the received transaction envelope
+    DestinationDoesNotExistError:
+      description: Destination doesn't exist
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4002
+        message:
+          type: string
+          example: Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' does not exist
+    DestinationExistsError:
+      description: Destination already exists
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4009
+        message:
+          type: string
+          example: Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' already exists
+    ExtraParamError:
+      description: Extra parameters
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4007
+        message:
+          type: string
+          example: The parameter '{extra_param}' was not expected for this requests body
+    InternalError:
+      description: Internal server error
+      type: object
+      properties:
+        code:
+          type: number
+          example: 500
+        message:
+          type: string
+          example: Internal server error
+    InvalidBodyError:
+      description: Invalid body
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4008
+        message:
+          type: string
+          example: The received body was not a valid json
+    InvalidParamError:
+      description: Invalid parameter
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4001
+        message:
+          type: string
+          example: Destination 'qwert' is not a valid public address
+    InvalidTransactionError:
+      description: Invalid transaction found
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4004
+        message:
+          type: string
+          example: The specified transaction was not a valid kin payment transaction
+    LowBalanceError:
+      description: Low balance
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4003
+        message:
+          type: string
+          example: The account does not have enough kin to perform this operation
+    MissingParamError:
+      description: Missing parameters
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4006
+        message:
+          type: string
+          example: The parameter '{missing_param}' was missing from the requests body
+    TransactionNotFoundError:
+      description: Transaction not found
+      type: object
+      properties:
+        code:
+          type: number
+          example: 4041
+        message:
+          type: string
+          example: Transaction 'ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd' was not found
+
+  responses:
+    LowBalanceError:
+      description: Sender does not have enough kin
+      content:
+        application/json:
           schema:
-            $ref: "#/definitions/StatusResponse"
-
-
-definitions:
-
-  PaymentRequest:
-    type: object
-    required: [destination, amount, memo]
-    properties:
-      destination:
-        type: string
-        example: GCJEHC2UOSIDPPIHJ2SH3B2ZL5XBB7KYK2M6OHXZTUW4NI2NEVVFVDLD
-      amount:
-        type: number
-        example: 130
-      memo:
-        type: string
-        example: "Order-123"
-
-  CreationRequest:
-    type: object
-    required: [destination, starting_balance, memo]
-    properties:
-      destination:
-        type: string
-        example: GCJEHC2UOSIDPPIHJ2SH3B2ZL5XBB7KYK2M6OHXZTUW4NI2NEVVFVDLD
-      starting_balance:
-        type: number
-        example: 5
-      memo:
-        type: string
-        example: null
-
-  TransactionResponse:
-    type: object
-    properties:
-      tx_id:
-        type: string
-        example: ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd
-
-  BalanceResponse:
-    type: object
-    properties:
-      balance:
-        type: number
-        example: 154.5
-
-  PaymentInfoResponse:
-    type: object
-    properties:
-      source:
-        type: string
-        example: "GDG57ST5LAJNFKSZHSSX7ME3ET6JTZQHDQF5LX7OM2GJNRSE2VJ2OSKB"
-      destination:
-        type: string
-        example: "GA3YVWB2N3RJCDNAGRD6WC6QIDYC5VP6KRBSG3EDL4UFQKMJBVMAET6Y"
-      amount:
-        type: number
-        example: 15
-      memo:
-        type: string
-        example: "Hello"
-      timestamp:
-        type: integer
-        example: 1547545819
-
-  WhitelistRequest:
-    type: object
-    properties:
-      envelope:
-        type: string
-        example: AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
-      network_id:
-        type: string
-        example: "Kin Mainnet ; December 2018"
-
-  WhitelistResponse:
-    type: object
-    properties:
-      tx_envelope:
-        type: string
-        example: AAAAACQpNXQ4NCGx5OeZCkDJTzqAdXYY4qedTmyUwcE2c02wAAAAAAANfdwAAAADAAAAAAAAAAEAAAAcMS1sNjhiLVQwQzJuUUZwOU1VeE5tRDc3RE5wcQAAAAEAAAAAAAAAAQAAAADSTsz/bFP7AezxTQVxZrzaHXErPrT49yakAlKWKxMSEQAAAAAAAAAAAJiWgAAAAAAAAAACNnNNsAAAAEDymQhlExH6oyNIVzxLDhTdQrEu567QmRguIsJ/nnCd2UsMxphe88NYAtcPsRGtLDeq/T3dVO6TuUp+BCTClIIHMU/hGAAAAEAbmxZQ81NFZAcpYHJgCctxeeWdKanlK92JoqX58ui0wAoaSb1DtpHMCdBQE/UGulz29zLC8A4Mgk/nq/rmqlMI
-
-  StatusResponse:
-    type: object
-    properties:
-      service_version:
-        type: string
-        example: "1.4.2"
-      horizon:
-        type: string
-        example: "http://horizon.kinfederation.com"
-      app_id:
-        type: string
-        example: "rc43"
-      public_address:
-        type: string
-        example: "GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX"
-      balance:
-        type: number
-        example: 179875
-      channels:
-        type: object
-        properties:
-          free_channels:
-            type: number
-            example: 17
-          non_free_channels:
-            type: number
-            example: 3
-          total_channels:
-            type: number
-            example: 20
-
-# Global Errors
-
-  InvalidParamError:
-    description: "Invalid parameter"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4001
-      message:
-        type: string
-        example: "Destination 'qwert' is not a valid public address"
-
-  InternalError:
-    description: "Internal server error"
-    type: object
-    properties:
-      code:
-        type: number
-        example : 500
-      message:
-        type: string
-        example: "Internal server error"
-
-  MissingParamError:
-    description: "Missing parameters"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4006
-      message:
-        type: string
-        example: "The parameter '{missing_param}' was missing from the requests body"
-
-  ExtraParamError:
-    description: "Extra parameters"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4007
-      message:
-        type: string
-        example: "The parameter '{extra_param}' was not expected for this requests body"
-
-  InvalidBodyError:
-    description: "Invalid body"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4008
-      message:
-        type: string
-        example: "The received body was not a valid json"
-
-
-# Specific Errors
-
-  DestinationDoesNotExistError:
-    description: "Destination doesn't exist"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4002
-      message:
-        type: string
-        example: "Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' does not exist"
-
-  DestinationExistsError:
-    description: "Destination already exists"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4009
-      message:
-        type: string
-        example: "Destination 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' already exists"
-
-  LowBalanceError:
-    description: "Low balance"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4003
-      message:
-        type: string
-        example: "The account does not have enough kin to perform this operation"
-
-  AccountNotFoundError:
-    description: "Account not found"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4041
-      message:
-        type: string
-        example: "Account 'GA5VKONC2ABAHER37Q6WZ7JLBEQ2RENLU2GVP2K2E2HAJT2T6CNPZ7QX' was not found"
-
-  TransactionNotFoundError:
-    description: "Transaction not found"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4041
-      message:
-        type: string
-        example: "Transaction 'ae9b957a857c843cd8d921820f9695daa5aa00f51f1665ff925999ab0ccd54bd' was not found"
-
-  InvalidTransactionError:
-    description: "Invalid transaction found"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4004
-      message:
-        type: string
-        example: "The specified transaction was not a valid kin payment transaction"
-
-  CantDecodeTransactionError:
-    description: "Cant decode the transaction envelope"
-    type: object
-    properties:
-      code:
-        type: number
-        example: 4005
-      message:
-        type: string
-        example: "The service is unable to decode the received transaction envelope"
+            $ref: "#/components/schemas/LowBalanceError"
+    SuccessfulTransaction:
+      description: Successful request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TransactionResponse"
