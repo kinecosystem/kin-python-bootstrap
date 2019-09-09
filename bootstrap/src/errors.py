@@ -61,7 +61,7 @@ class DestinationDoesNotExistError(BootstrapError):
 class LowBalanceError(BootstrapError):
     def __init__(self):
         self.code = 4003
-        self.http_code = 500
+        self.http_code = 400
         message = f"The account does not have enough kin to perform this operation"
         super(LowBalanceError, self).__init__(message)
 
