@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# As a convenience for where host names will be persistent across reboots
+# running this script as the container's `CMD` will suffix the passed
+# salt (if it exists) with the container's hostname, before starting
+# the server, creating a unique but persistent salt per hostname.
+
+[ ! -z ${CHANNEL_SALT} ] && export CHANNEL_SALT=${CHANNEL_SALT}-$(hostname)
+
+pipenv run python main.py
