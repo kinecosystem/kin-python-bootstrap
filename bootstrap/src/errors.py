@@ -4,7 +4,7 @@ from pydantic import ValidationError, ExtraError, MissingError, PydanticTypeErro
 
 class InternalError(Exception):
     """Internal error to use when when an unexpected exception happens"""
-    error = 'Internal server error'
+    error = "Internal server error"
     code = 500
 
     def to_dict(self):
@@ -20,7 +20,7 @@ class BootstrapError(Exception):
         return {'code': self.code, 'message': self.error}
 
     def __str__(self):
-        return f'{type(self).__name__}: {self.error}'
+        return f"{type(self).__name__}: {self.error}"
 
     def __repr__(self):
         return self.__str__()
@@ -53,7 +53,7 @@ class ExtraParamError(BootstrapError):
 class DestinationDoesNotExistError(BootstrapError):
     def __init__(self, destination):
         self.code = 4002
-        self.http_code = 400
+        self.http_code = 404
         message = f"Destination '{destination}' does not exist"
         super(DestinationDoesNotExistError, self).__init__(message)
 
@@ -62,7 +62,7 @@ class LowBalanceError(BootstrapError):
     def __init__(self):
         self.code = 4003
         self.http_code = 400
-        message = f'The account does not have enough kin to perform this operation'
+        message = f"The account does not have enough kin to perform this operation"
         super(LowBalanceError, self).__init__(message)
 
 
@@ -86,7 +86,7 @@ class InvalidTransactionError(BootstrapError):
     def __init__(self):
         self.code = 4004
         self.http_code = 400
-        message = f'The specified transaction was not a valid kin payment transaction'
+        message = f"The specified transaction was not a valid kin payment transaction"
         super(InvalidTransactionError, self).__init__(message)
 
 
@@ -94,14 +94,14 @@ class CantDecodeTransactionError(BootstrapError):
     def __init__(self):
         self.code = 4005
         self.http_code = 400
-        message = f'The service was unable to decode the received transaction envelope'
+        message = f"The service was unable to decode the received transaction envelope"
         super(CantDecodeTransactionError, self).__init__(message)
 
 
 class DestinationExistsError(BootstrapError):
     def __init__(self, destination):
         self.code = 4009
-        self.http_code = 400
+        self.http_code = 409
         message = f"Destination '{destination}' already exists"
         super(DestinationExistsError, self).__init__(message)
 
@@ -110,7 +110,7 @@ class InvalidBodyError(BootstrapError):
     def __init__(self):
         self.code = 4008
         self.http_code = 400
-        message = f'The received body was not a valid json'
+        message = f"The received body was not a valid json"
         super(InvalidBodyError, self).__init__(message)
 
 
@@ -131,6 +131,6 @@ def translate_validation_error(val_error: ValidationError) -> BootstrapError:
     if isinstance(first_error, MissingError):
         return MissingParamError(faulty_arg)
     if isinstance(first_error, PydanticTypeError):
-        return InvalidParamError(f'Parameter {faulty_arg}, is invalid: {first_error}')
+        return InvalidParamError(f"Parameter {faulty_arg}, is invalid: {first_error}")
 
     raise val_error  # If we can't translate the error, raise it like that.
