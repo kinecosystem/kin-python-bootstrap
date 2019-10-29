@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     """
 
     SEED: str = 'SCOMIY6IHXNIL6ZFTBBYDLU65VONYWI3Y6EN4IDWDP2IIYTCYZBCCE6C'
+    WHITELISTED: bool = False
     HORIZON_ENDPOINT: str = kin_config.HORIZON_URI_TEST
     NETWORK_PASSPHRASE: str = kin_config.HORIZON_PASSPHRASE_TEST
     APP_ID: str = kin_config.ANON_APP_ID
