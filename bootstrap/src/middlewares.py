@@ -63,7 +63,11 @@ def init_middlewares(app: Sanic, config):
     @app.listener('before_server_start')
     async def setup_kin_with_network(app, loop):
         """This method is separate from "setup_kin" cause it makes network calls that we want to mock"""
-        app.minimum_fee = await app.kin_client.get_minimum_fee()
+        if config.WHITELISTED is True:
+          app.minimum_fee = 0
+        else:
+          app.minimum_fee = await app.kin_client.get_minimum_fee()
+        logger.debug(f'config.WHITELISTED was {config.WHITELISTED}, setting transaction fee to: {app.minimum_fee}')
 
         # Create channels
         if config.CHANNEL_COUNT > 0:
