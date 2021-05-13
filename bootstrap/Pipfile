@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 sanic = "==19.3.*"
-pydantic = "==0.23"
+pydantic = "==1.6.2"
 kin-sdk = "==2.4.0"
 
 [dev-packages]
